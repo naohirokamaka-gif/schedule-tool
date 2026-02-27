@@ -1,0 +1,468 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="ja"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;title&gt;スケジュール表 自動生成システム&lt;/title&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- スタイリングのためのライブラリ (Tailwind CSS) --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- システムを動かすためのライブラリ (React) --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin&gt;&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- ブラウザ上でコードを翻訳するライブラリ (Babel) --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/@babel/standalone/babel.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>/* スクロールバーのカスタマイズ */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>::-webkit-scrollbar { width: 8px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>::-webkit-scrollbar-track { background: #f1f1f1; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body class="bg-gray-100 h-screen overflow-hidden"&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div id="root" class="h-full"&gt;&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- ここからシステムの本体 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script type="text/babel"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const { useState, useEffect, useMemo } = React;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// --- アイコンの設定 ---</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconCalendar = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;rect x="3" y="4" width="18" height="18" rx="2" ry="2"&gt;&lt;/rect&gt;&lt;line x1="16" y1="2" x2="16" y2="6"&gt;&lt;/line&gt;&lt;line x1="8" y1="2" x2="8" y2="6"&gt;&lt;/line&gt;&lt;line x1="3" y1="10" x2="21" y2="10"&gt;&lt;/line&gt;&lt;/svg&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconList = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;line x1="8" y1="6" x2="21" y2="6"&gt;&lt;/line&gt;&lt;line x1="8" y1="12" x2="21" y2="12"&gt;&lt;/line&gt;&lt;line x1="8" y1="18" x2="21" y2="18"&gt;&lt;/line&gt;&lt;line x1="3" y1="6" x2="3.01" y2="6"&gt;&lt;/line&gt;&lt;line x1="3" y1="12" x2="3.01" y2="12"&gt;&lt;/line&gt;&lt;line x1="3" y1="18" x2="3.01" y2="18"&gt;&lt;/line&gt;&lt;/svg&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconSettings = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;circle cx="12" cy="12" r="3"&gt;&lt;/circle&gt;&lt;path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"&gt;&lt;/path&gt;&lt;/svg&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconPlus = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;line x1="12" y1="5" x2="12" y2="19"&gt;&lt;/line&gt;&lt;line x1="5" y1="12" x2="19" y2="12"&gt;&lt;/line&gt;&lt;/svg&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconCopy = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;rect x="9" y="9" width="13" height="13" rx="2" ry="2"&gt;&lt;/rect&gt;&lt;path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"&gt;&lt;/path&gt;&lt;/svg&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconTrash2 = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;polyline points="3 6 5 6 21 6"&gt;&lt;/polyline&gt;&lt;path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"&gt;&lt;/path&gt;&lt;line x1="10" y1="11" x2="10" y2="17"&gt;&lt;/line&gt;&lt;line x1="14" y1="11" x2="14" y2="17"&gt;&lt;/line&gt;&lt;/svg&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconSmartphone = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;rect x="5" y="2" width="14" height="20" rx="2" ry="2"&gt;&lt;/rect&gt;&lt;line x1="12" y1="18" x2="12.01" y2="18"&gt;&lt;/line&gt;&lt;/svg&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconMonitor = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;rect x="2" y="3" width="20" height="14" rx="2" ry="2"&gt;&lt;/rect&gt;&lt;line x1="8" y1="21" x2="16" y2="21"&gt;&lt;/line&gt;&lt;line x1="12" y1="17" x2="12" y2="21"&gt;&lt;/line&gt;&lt;/svg&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const IconCheck = ({ className }) =&gt; (&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;polyline points="20 6 9 17 4 12"&gt;&lt;/polyline&gt;&lt;/svg&gt;);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// --- 初期データ ---</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const defaultCategories = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'c1', name: '【本講座】養成講座第3期', color: '#4a86e8' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'c2', name: '【グルコン】第3期グループコンサル', color: '#3d85c6' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'c3', name: '【院長限定】「10の幸せ」セミナー', color: '#f59e0b' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'c4', name: '【専門特化】専門特化セミナー', color: '#a64d79' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'c5', name: '【新人研修】新人向け研修', color: '#6aa84f' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'c6', name: '【リーダー】リーダー養成フォロー', color: '#b45f06' }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const defaultEvents = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'e1', month: 4, datetime: '18(土) 14:00〜21:00', categoryId: 'c3', title: 'すべての長期的な幸福の在り方を整える', person: '講師：遠藤隆弘' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'e2', month: 5, datetime: '28(木) 10:00〜19:00', categoryId: 'c1', title: 'DAY1', person: '講師：遠藤,石上,久高' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'e3', month: 5, datetime: '30(土) 14:00〜21:00', categoryId: 'c3', title: '自分への信頼・健康', person: '講師：遠藤隆弘' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'e4', month: 6, datetime: '11(木) 10:00〜19:00', categoryId: 'c1', title: 'DAY2', person: '' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'e5', month: 6, datetime: '24(水) 14:00〜19:00', categoryId: 'c4', title: '成果 ※法人会員無料', person: '講師：石上' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'e6', month: 6, datetime: '27(土) 14:00〜21:00', categoryId: 'c3', title: '家族・仲間(人間関係)', person: '講師：遠藤隆弘' },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ id: 'e7', month: 7, datetime: '01(水) 13:00〜15:00', categoryId: 'c2', title: '', person: '担当:遠藤' }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// XSS対策のエスケープ関数</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const escapeHtml = (unsafe) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (!unsafe) return '';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return unsafe</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.replace(/&amp;/g, "&amp;amp;")</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.replace(/&lt;/g, "&amp;lt;")</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.replace(/&gt;/g, "&amp;gt;")</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.replace(/"/g, "&amp;quot;")</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.replace(/'/g, "&amp;#039;");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function App() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const [categories, setCategories] = useState(defaultCategories);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const [events, setEvents] = useState(defaultEvents);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">      </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// UI State</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const [editTab, setEditTab] = useState('events');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const [outputTab, setOutputTab] = useState('preview');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const [previewMode, setPreviewMode] = useState('mobile');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const [copied, setCopied] = useState(false);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// カテゴリ操作</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const addCategory = () =&gt; setCategories([...categories, { id: 'c' + Date.now(), name: '新しい種別', color: '#000000' }]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const updateCategory = (id, field, value) =&gt; setCategories(categories.map(c =&gt; c.id === id ? { ...c, [field]: value } : c));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const removeCategory = (id) =&gt; setCategories(categories.filter(c =&gt; c.id !== id));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// イベント操作</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const addEvent = () =&gt; setEvents([...events, { id: 'e' + Date.now(), month: 4, datetime: '', categoryId: categories[0]?.id || '', title: '', person: '' }]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const duplicateEvent = (ev) =&gt; setEvents([...events, { ...ev, id: 'e' + Date.now() }]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const updateEvent = (id, field, value) =&gt; setEvents(events.map(e =&gt; e.id === id ? { ...e, [field]: value } : e));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const removeEvent = (id) =&gt; setEvents(events.filter(e =&gt; e.id !== id));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// HTMLコード生成ロジック</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const htmlCode = useMemo(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const eventsByMonth = {};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>events.forEach(ev =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>if (!eventsByMonth[ev.month]) eventsByMonth[ev.month] = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>eventsByMonth[ev.month].push(ev);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const sortedMonths = Object.keys(eventsByMonth).map(Number).sort((a, b) =&gt; a - b);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const monthLabels = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>1: '1月 JANUARY', 2: '2月 FEBRUARY', 3: '3月 MARCH', 4: '4月 APRIL',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>5: '5月 MAY', 6: '6月 JUNE', 7: '7月 JULY', 8: '8月 AUGUST',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>9: '9月 SEPTEMBER', 10: '10月 OCTOBER', 11: '11月 NOVEMBER', 12: '12月 DECEMBER'</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const legendHtml = categories.map(cat =&gt; `</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="ca-legend-item"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="ca-legend-mark" style="background-color: ${escapeHtml(cat.color)};"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>${escapeHtml(cat.name)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>`).join('');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const monthsHtml = sortedMonths.map(month =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const monthEvents = eventsByMonth[month].map(ev =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const cat = categories.find(c =&gt; c.id === ev.categoryId) || { color: '#ccc', name: '' };</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return `</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="ca-event"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div class="ca-event-mark" style="background-color: ${escapeHtml(cat.color)};"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div class="ca-event-body"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;div class="ca-event-time"&gt;${escapeHtml(ev.datetime)}&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>${ev.title ? `&lt;div class="ca-event-title"&gt;${escapeHtml(ev.title)}&lt;/div&gt;` : ''}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>${ev.person ? `&lt;div class="ca-event-person"&gt;${escapeHtml(ev.person)}&lt;/div&gt;` : ''}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>}).join('');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>return `</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="ca-month"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;button class="ca-month-btn"&gt;${monthLabels[month]} &lt;span class="ca-chevron"&gt;▼&lt;/span&gt;&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="ca-month-content"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>${monthEvents}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}).join('');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return `</span></p>
+<p class="p1"><span class="s1">&lt;!-- ↓ ここからコピーしてLP作成ツールの「カスタムHTML」に貼り付け ↓ --&gt;</span></p>
+<p class="p1"><span class="s1">&lt;style&gt;</span></p>
+<p class="p1"><span class="s1">.ca-schedule-wrapper {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #1a1a1a;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-width: 800px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin: 0 auto;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>line-height: 1.5;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-sizing: border-box;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.ca-schedule-wrapper * { box-sizing: inherit; }</span></p>
+<p class="p1"><span class="s1">.ca-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-bottom: 24px; padding: 0 10px; }</span></p>
+<p class="p1"><span class="s1">.ca-legend-item { display: flex; align-items: center; font-size: 14px; font-weight: 600; color: #333; }</span></p>
+<p class="p1"><span class="s1">.ca-legend-mark { width: 14px; height: 14px; margin-right: 8px; border-radius: 2px; }</span></p>
+<p class="p1"><span class="s1">.ca-month { margin-bottom: 16px; border-radius: 8px; background: #fff; }</span></p>
+<p class="p1"><span class="s1">.ca-month-btn {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 100%; text-align: left; background: #d0d8dc; border: none; border-radius: 8px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: 16px 20px; font-size: 16px; font-weight: bold; cursor: pointer;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex; justify-content: space-between; align-items: center; color: #222;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transition: background 0.2s, border-radius 0.2s;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.ca-month-btn:hover { background: #bec9cf; }</span></p>
+<p class="p1"><span class="s1">.ca-month-btn.active { border-radius: 8px 8px 0 0; }</span></p>
+<p class="p1"><span class="s1">.ca-chevron { font-size: 12px; transition: transform 0.3s; color: #666; }</span></p>
+<p class="p1"><span class="s1">.ca-month-btn.active .ca-chevron { transform: rotate(180deg); }</span></p>
+<p class="p1"><span class="s1">.ca-month-content {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: none; padding: 0; border: 1px solid #d0d8dc; border-top: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 0 0 8px 8px; background-color: #fafbfc; animation: caFadeIn 0.3s ease;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.ca-month-content.open { display: block; }</span></p>
+<p class="p1"><span class="s1">@keyframes caFadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }</span></p>
+<p class="p1"><span class="s1">.ca-event { display: flex; padding: 20px; border-bottom: 1px dashed #ccc; }</span></p>
+<p class="p1"><span class="s1">.ca-event:last-child { border-bottom: none; }</span></p>
+<p class="p1"><span class="s1">.ca-event-mark { width: 16px; height: 16px; border-radius: 3px; margin-right: 16px; flex-shrink: 0; margin-top: 3px; }</span></p>
+<p class="p1"><span class="s1">.ca-event-body { flex-grow: 1; }</span></p>
+<p class="p1"><span class="s1">.ca-event-time { font-weight: bold; font-size: 15px; margin-bottom: 6px; color: #000; }</span></p>
+<p class="p1"><span class="s1">.ca-event-title { font-size: 15px; font-weight: bold; margin-bottom: 6px; color: #222; }</span></p>
+<p class="p1"><span class="s1">.ca-event-person { font-size: 13px; color: #555; }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">/* スマホ向け調整 */</span></p>
+<p class="p1"><span class="s1">@media (max-width: 600px) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.ca-legend-item { font-size: 12px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.ca-month-btn { font-size: 15px; padding: 14px 16px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.ca-event { padding: 16px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.ca-event-time { font-size: 14px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.ca-event-title { font-size: 14px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.ca-event-person { font-size: 12px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.ca-event-mark { margin-right: 12px; }</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div id="ca-schedule-wrapper" class="ca-schedule-wrapper"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="ca-legend"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>${legendHtml}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="ca-months"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>${monthsHtml}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;script&gt;</span></p>
+<p class="p1"><span class="s1">(function() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>var container = document.getElementById('ca-schedule-wrapper');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!container) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>var btns = container.querySelectorAll('.ca-month-btn');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>btns.forEach(function(btn) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>btn.addEventListener('click', function() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>this.classList.toggle('active');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>var content = this.nextElementSibling;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (content) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>content.classList.toggle('open');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p1"><span class="s1">})();</span></p>
+<p class="p1"><span class="s1">&lt;\/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- ↑ ここまでコピー ↑ --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>`.trim();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}, [categories, events]);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const handleCopyCode = () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>try {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const textarea = document.createElement('textarea');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>textarea.value = htmlCode;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>document.body.appendChild(textarea);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>textarea.select();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>document.execCommand('copy');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>document.body.removeChild(textarea);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>setCopied(true);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>setTimeout(() =&gt; setCopied(false), 2000);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>} catch (e) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>alert("コピーに失敗しました。手動でコピーしてください。");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="flex flex-col h-screen bg-gray-100 font-sans"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>{/* Header */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;header className="bg-slate-800 text-white p-4 shadow-md flex justify-between items-center shrink-0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h1 className="text-xl font-bold flex items-center gap-3"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;IconCalendar className="w-6 h-6 text-blue-400" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>スケジュール表 自動生成システム</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/header&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">          </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>{/* Main Content */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;main className="flex-1 flex flex-col md:flex-row overflow-hidden"&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{/* === Left Panel: Editor === */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="w-full md:w-1/2 flex flex-col border-r border-gray-300 bg-white z-10 h-1/2 md:h-full"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>{/* Tabs */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="flex border-b bg-gray-50 shrink-0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>className={`flex-1 p-3 text-center font-bold text-sm flex items-center justify-center gap-2 transition-colors ${editTab === 'events' ? 'bg-white border-b-2 border-blue-600 text-blue-700' : 'text-gray-500 hover:bg-gray-100'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>onClick={() =&gt; setEditTab('events')}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;IconList className="w-4 h-4"/&gt; イベント設定</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>className={`flex-1 p-3 text-center font-bold text-sm flex items-center justify-center gap-2 transition-colors ${editTab === 'categories' ? 'bg-white border-b-2 border-blue-600 text-blue-700' : 'text-gray-500 hover:bg-gray-100'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>onClick={() =&gt; setEditTab('categories')}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;IconSettings className="w-4 h-4"/&gt; イベント種別 (色)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">              </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>{/* Tab Content */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50"&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{/* --- Events Editor --- */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{editTab === 'events' &amp;&amp; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div className="flex justify-between items-end mb-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;p className="text-sm text-gray-600"&gt;追加したイベントは、月ごとに自動でまとまって表示されます。&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;button onClick={addEvent} className="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 flex items-center gap-1 text-sm font-bold transition-colors"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;IconPlus className="w-4 h-4" /&gt; 追加</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>{events.length === 0 ? (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;div className="text-center py-10 text-gray-400 bg-white rounded-lg border border-dashed"&gt;イベントがありません&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>) : (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>events.map((ev, index) =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;div key={ev.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-4 relative hover:shadow-md transition-shadow"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;div className="absolute top-3 right-3 flex gap-2"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;button onClick={() =&gt; duplicateEvent(ev)} title="複製" className="text-gray-400 hover:text-blue-600 p-1 bg-gray-50 rounded"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;IconCopy className="w-4 h-4"/&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;button onClick={() =&gt; removeEvent(ev.id)} title="削除" className="text-gray-400 hover:text-red-500 p-1 bg-gray-50 rounded"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;IconTrash2 className="w-4 h-4"/&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                          </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;div className="grid grid-cols-12 gap-3 mt-1"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;div className="col-span-12 sm:col-span-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;label className="block text-xs font-bold text-gray-600 mb-1"&gt;開催月&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;select value={ev.month} onChange={e =&gt; updateEvent(ev.id, 'month', Number(e.target.value))} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>{[...Array(12)].map((_, i) =&gt; &lt;option key={i+1} value={i+1}&gt;{i+1}月&lt;/option&gt;)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;/select&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;div className="col-span-12 sm:col-span-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;label className="block text-xs font-bold text-gray-600 mb-1"&gt;開催日時 &lt;span className="text-gray-400 font-normal"&gt;(例: 18(土) 14:00〜21:00)&lt;/span&gt;&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;input type="text" value={ev.datetime} onChange={e =&gt; updateEvent(ev.id, 'datetime', e.target.value)} placeholder="例: 18(土) 14:00〜21:00" className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;div className="col-span-12"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;label className="block text-xs font-bold text-gray-600 mb-1"&gt;種別 (色)&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;select value={ev.categoryId} onChange={e =&gt; updateEvent(ev.id, 'categoryId', e.target.value)} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>{categories.map(c =&gt; &lt;option key={c.id} value={c.id}&gt;{c.name}&lt;/option&gt;)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;/select&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;div className="col-span-12 sm:col-span-6"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;label className="block text-xs font-bold text-gray-600 mb-1"&gt;イベント名&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;input type="text" value={ev.title} onChange={e =&gt; updateEvent(ev.id, 'title', e.target.value)} placeholder="例: すべての幸福の在り方" className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;div className="col-span-12 sm:col-span-6"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;label className="block text-xs font-bold text-gray-600 mb-1"&gt;担当者名&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                              </span>&lt;input type="text" value={ev.person} onChange={e =&gt; updateEvent(ev.id, 'person', e.target.value)} placeholder="例: 講師：遠藤隆弘" className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>))</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;button onClick={addEvent} className="w-full mt-2 py-3 border-2 border-dashed border-gray-300 text-gray-500 font-bold rounded-lg hover:bg-gray-100 transition-colors flex justify-center items-center gap-2"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;IconPlus className="w-5 h-5" /&gt; 新しいイベントを追加</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>)}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{/* --- Categories Editor --- */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{editTab === 'categories' &amp;&amp; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;p className="text-sm text-gray-600 mb-4"&gt;画面上部の「凡例」として表示され、各イベントの色分けに使用されます。&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>{categories.map(cat =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;div key={cat.id} className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;div className="relative shrink-0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;input type="color" value={cat.color} onChange={e =&gt; updateCategory(cat.id, 'color', e.target.value)} className="w-10 h-10 p-0 border-0 rounded cursor-pointer" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;input type="text" value={cat.name} onChange={e =&gt; updateCategory(cat.id, 'name', e.target.value)} placeholder="例: 【本講座】養成講座" className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;button onClick={() =&gt; removeCategory(cat.id)} title="削除" className="text-gray-400 hover:text-red-500 p-2 shrink-0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;IconTrash2 className="w-5 h-5"/&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>))}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;button onClick={addCategory} className="w-full mt-4 py-2 bg-gray-100 text-gray-700 font-bold rounded hover:bg-gray-200 transition-colors flex justify-center items-center gap-1 text-sm"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;IconPlus className="w-4 h-4" /&gt; 種別を追加</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>)}</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{/* === Right Panel: Output === */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="w-full md:w-1/2 flex flex-col bg-white h-1/2 md:h-full"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>{/* Tabs */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="flex border-b bg-gray-100 shrink-0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>className={`flex-1 p-3 text-center font-bold text-sm transition-colors ${outputTab === 'preview' ? 'bg-white border-t-2 border-green-500 text-green-700' : 'text-gray-500 hover:bg-gray-200'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>onClick={() =&gt; setOutputTab('preview')}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&gt;プレビュー画面&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>className={`flex-1 p-3 text-center font-bold text-sm transition-colors ${outputTab === 'code' ? 'bg-white border-t-2 border-green-500 text-green-700' : 'text-gray-500 hover:bg-gray-200'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>onClick={() =&gt; setOutputTab('code')}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&gt;HTMLコード出力&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">              </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>{/* Output Content */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="flex-1 overflow-hidden p-0 relative bg-gray-200 flex flex-col"&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{/* --- Preview Panel --- */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{outputTab === 'preview' &amp;&amp; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;div className="h-full flex flex-col"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div className="bg-white px-4 py-2 border-b border-gray-200 flex justify-between items-center shrink-0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;span className="text-xs font-bold text-gray-500"&gt;表示サイズの確認&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;div className="flex bg-gray-100 rounded-md p-1"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;button onClick={() =&gt; setPreviewMode('mobile')} className={`px-3 py-1 rounded text-sm flex items-center gap-1 transition-colors ${previewMode === 'mobile' ? 'bg-white shadow text-blue-600 font-bold' : 'text-gray-500'}`}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;IconSmartphone className="w-4 h-4"/&gt; スマホ</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;button onClick={() =&gt; setPreviewMode('pc')} className={`px-3 py-1 rounded text-sm flex items-center gap-1 transition-colors ${previewMode === 'pc' ? 'bg-white shadow text-blue-600 font-bold' : 'text-gray-500'}`}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>&lt;IconMonitor className="w-4 h-4"/&gt; PC</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div className="flex-1 overflow-y-auto p-4 flex justify-center items-start"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;div<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>className={`transition-all duration-300 bg-white shadow-xl overflow-hidden`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>style={{<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>width: previewMode === 'mobile' ? '375px' : '100%',<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>maxWidth: '800px',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>minHeight: '400px',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>height: '100%',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>borderRadius: previewMode === 'mobile' ? '20px' : '8px',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>border: previewMode === 'mobile' ? '8px solid #333' : 'none'</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>}}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{/* HTMLコードを直接流し込んでプレビュー */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;iframe<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>title="preview"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>srcDoc={htmlCode}<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                          </span>className="w-full h-full border-none"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>/&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>)}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{/* --- Code Panel --- */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{outputTab === 'code' &amp;&amp; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;div className="h-full flex flex-col p-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div className="bg-green-50 border border-green-200 p-4 rounded-lg mb-4 shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;p className="text-sm font-bold text-green-800 mb-1"&gt;完成しました！&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;p className="text-xs text-green-700"&gt;下のコードをコピーして、STUDIOやWix、WordPress等の「カスタムHTML（またはHTML埋め込み）」ブロックに貼り付けてください。&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;button<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>onClick={handleCopyCode}<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>className={`shrink-0 px-4 py-2 rounded shadow font-bold text-sm flex items-center gap-2 transition-colors ${copied ? 'bg-green-600 text-white' : 'bg-white text-gray-800 hover:bg-gray-50 border border-gray-300'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{copied ? &lt;&gt;&lt;IconCheck className="w-4 h-4" /&gt; コピー完了！&lt;/&gt; : &lt;&gt;&lt;IconCopy className="w-4 h-4" /&gt; コードをコピー&lt;/&gt;}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;textarea<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>readOnly<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>value={htmlCode}<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>className="flex-1 w-full border border-gray-300 rounded-lg p-4 font-mono text-xs md:text-sm bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>onClick={(e) =&gt; e.target.select()}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>/&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>)}</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/main&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const root = ReactDOM.createRoot(document.getElementById('root'));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>root.render(&lt;App /&gt;);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
